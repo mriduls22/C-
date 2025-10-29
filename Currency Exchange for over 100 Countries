@@ -1,0 +1,119 @@
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+// Vector of currency pairs: {code, name}
+vector<pair<string, string>> currencies = {
+    {"USD", "US Dollar"}, {"EUR", "Euro"}, {"GBP", "British Pound"}, {"JPY", "Japanese Yen"}, {"CAD", "Canadian Dollar"},
+    {"AUD", "Australian Dollar"}, {"CHF", "Swiss Franc"}, {"CNY", "Chinese Yuan"}, {"INR", "Indian Rupee"}, {"KRW", "South Korean Won"},
+    {"BRL", "Brazilian Real"}, {"MXN", "Mexican Peso"}, {"RUB", "Russian Ruble"}, {"ZAR", "South African Rand"}, {"SGD", "Singapore Dollar"},
+    {"HKD", "Hong Kong Dollar"}, {"NZD", "New Zealand Dollar"}, {"SEK", "Swedish Krona"}, {"NOK", "Norwegian Krone"}, {"DKK", "Danish Krone"},
+    {"PLN", "Polish Zloty"}, {"CZK", "Czech Koruna"}, {"HUF", "Hungarian Forint"}, {"TRY", "Turkish Lira"}, {"ILS", "Israeli Shekel"},
+    {"EGP", "Egyptian Pound"}, {"THB", "Thai Baht"}, {"MYR", "Malaysian Ringgit"}, {"IDR", "Indonesian Rupiah"}, {"PHP", "Philippine Peso"},
+    {"VND", "Vietnamese Dong"}, {"PKR", "Pakistani Rupee"}, {"BDT", "Bangladeshi Taka"}, {"LKR", "Sri Lankan Rupee"}, {"NPR", "Nepalese Rupee"},
+    {"MMK", "Myanmar Kyat"}, {"KHR", "Cambodian Riel"}, {"LAK", "Laotian Kip"}, {"BND", "Brunei Dollar"}, {"TWD", "Taiwan Dollar"},
+    {"MOP", "Macanese Pataca"}, {"JOD", "Jordanian Dinar"}, {"BHD", "Bahraini Dinar"}, {"KWD", "Kuwaiti Dinar"}, {"SAR", "Saudi Riyal"},
+    {"AED", "UAE Dirham"}, {"OMR", "Omani Rial"}, {"QAR", "Qatari Riyal"}, {"YER", "Yemeni Rial"}, {"IQD", "Iraqi Dinar"},
+    {"SYP", "Syrian Pound"}, {"LBP", "Lebanese Pound"}, {"JMD", "Jamaican Dollar"}, {"TTD", "Trinidad and Tobago Dollar"}, {"BBD", "Barbadian Dollar"},
+    {"BSD", "Bahamian Dollar"}, {"KYD", "Cayman Islands Dollar"}, {"XCD", "East Caribbean Dollar"}, {"ANG", "Netherlands Antillean Guilder"}, {"AWG", "Aruban Florin"},
+    {"BMD", "Bermudian Dollar"}, {"BZD", "Belize Dollar"}, {"CUC", "Cuban Convertible Peso"}, {"CUP", "Cuban Peso"}, {"DOP", "Dominican Peso"},
+    {"HTG", "Haitian Gourde"}, {"NIO", "Nicaraguan Cordoba"}, {"PAB", "Panamanian Balboa"}, {"SVC", "Salvadoran Colon"}, {"GIP", "Gibraltar Pound"},
+    {"FKP", "Falkland Islands Pound"}, {"SHP", "Saint Helena Pound"}, {"GGP", "Guernsey Pound"}, {"IMP", "Isle of Man Pound"}, {"JEP", "Jersey Pound"},
+    {"ALL", "Albanian Lek"}, {"AMD", "Armenian Dram"}, {"AZN", "Azerbaijani Manat"}, {"BAM", "Bosnia-Herzegovina Convertible Mark"}, {"BGN", "Bulgarian Lev"},
+    {"BYN", "Belarusian Ruble"}, {"GEL", "Georgian Lari"}, {"HRK", "Croatian Kuna"}, {"ISK", "Icelandic Krona"}, {"KGS", "Kyrgyzstani Som"},
+    {"KZT", "Kazakhstani Tenge"}, {"MDL", "Moldovan Leu"}, {"MKD", "Macedonian Denar"}, {"MNT", "Mongolian Tugrik"}, {"RSD", "Serbian Dinar"},
+    {"TJS", "Tajikistani Somoni"}, {"TMT", "Turkmenistani Manat"}, {"UAH", "Ukrainian Hryvnia"}, {"UZS", "Uzbekistani Som"}, {"AFN", "Afghan Afghani"},
+    {"DZD", "Algerian Dinar"}, {"AOA", "Angolan Kwanza"}, {"XAF", "Central African CFA Franc"}, {"XOF", "West African CFA Franc"}, {"BIF", "Burundian Franc"},
+    {"CDF", "Congolese Franc"}, {"CVE", "Cape Verdean Escudo"}, {"DJF", "Djiboutian Franc"}, {"ERN", "Eritrean Nakfa"}, {"ETB", "Ethiopian Birr"},
+    {"GMD", "Gambian Dalasi"}, {"GNF", "Guinean Franc"}, {"KES", "Kenyan Shilling"}, {"KMF", "Comorian Franc"}, {"LSL", "Lesotho Loti"},
+    {"LRD", "Liberian Dollar"}, {"LYD", "Libyan Dinar"}, {"MAD", "Moroccan Dirham"}, {"MGA", "Malagasy Ariary"}, {"MUR", "Mauritian Rupee"},
+    {"MZN", "Mozambican Metical"}, {"NAD", "Namibian Dollar"}, {"NGN", "Nigerian Naira"}, {"RWF", "Rwandan Franc"}, {"SCR", "Seychellois Rupee"},
+    {"SDG", "Sudanese Pound"}, {"SOS", "Somali Shilling"}, {"SSP", "South Sudanese Pound"}, {"SZL", "Swazi Lilangeni"}, {"TND", "Tunisian Dinar"},
+    {"TZS", "Tanzanian Shilling"}, {"UGX", "Ugandan Shilling"}, {"XPF", "CFP Franc"}, {"ZMW", "Zambian Kwacha"}, {"ZWL", "Zimbabwean Dollar"},
+    {"ARS", "Argentine Peso"}, {"BOB", "Bolivian Boliviano"}, {"CLP", "Chilean Peso"}, {"COP", "Colombian Peso"}, {"CRC", "Costa Rican Colon"},
+    {"CUP", "Cuban Peso"}, {"DOP", "Dominican Peso"}, {"GTQ", "Guatemalan Quetzal"}, {"HNL", "Honduran Lempira"}, {"PYG", "Paraguayan Guarani"},
+    {"PEN", "Peruvian Sol"}, {"SRD", "Surinamese Dollar"}, {"UYU", "Uruguayan Peso"}, {"VES", "Venezuelan Bolivar"}, {"FJD", "Fijian Dollar"},
+    {"PGK", "Papua New Guinean Kina"}, {"SBD", "Solomon Islands Dollar"}, {"TOP", "Tongan Pa'anga"}, {"VUV", "Vanuatu Vatu"}, {"WST", "Samoan Tala"},
+    {"BTN", "Bhutanese Ngultrum"}, {"MVR", "Maldivian Rufiyaa"}, {"KPW", "North Korean Won"}, {"STN", "Sao Tome and Principe Dobra"}, {"TVD", "Tuvaluan Dollar"}
+};
+
+// Map for quick lookup of rates
+map<string, double> rates;
+
+void initializeRates() {
+    rates["USD"] = 1.0; rates["EUR"] = 0.85; rates["GBP"] = 0.73; rates["JPY"] = 110.0; rates["CAD"] = 1.25;
+    rates["AUD"] = 1.35; rates["CHF"] = 0.92; rates["CNY"] = 6.45; rates["INR"] = 74.5; rates["KRW"] = 1180.0;
+    rates["BRL"] = 5.2; rates["MXN"] = 20.0; rates["RUB"] = 75.0; rates["ZAR"] = 14.5; rates["SGD"] = 1.35;
+    rates["HKD"] = 7.8; rates["NZD"] = 1.4; rates["SEK"] = 8.6; rates["NOK"] = 8.5; rates["DKK"] = 6.3;
+    rates["PLN"] = 3.9; rates["CZK"] = 21.5; rates["HUF"] = 290.0; rates["TRY"] = 8.5; rates["ILS"] = 3.2;
+    rates["EGP"] = 15.7; rates["THB"] = 27.5; rates["MYR"] = 4.2; rates["IDR"] = 14300.0; rates["PHP"] = 50.0;
+    rates["VND"] = 22700.0; rates["PKR"] = 160.0; rates["BDT"] = 85.0; rates["LKR"] = 200.0; rates["NPR"] = 118.0;
+    rates["MMK"] = 1850.0; rates["KHR"] = 4050.0; rates["LAK"] = 8800.0; rates["BND"] = 1.35; rates["TWD"] = 27.8;
+    rates["MOP"] = 8.0; rates["JOD"] = 0.71; rates["BHD"] = 0.38; rates["KWD"] = 0.30; rates["SAR"] = 3.75;
+    rates["AED"] = 3.67; rates["OMR"] = 0.38; rates["QAR"] = 3.64; rates["YER"] = 250.0; rates["IQD"] = 1460.0;
+    rates["SYP"] = 2512.0; rates["LBP"] = 1507.0; rates["JMD"] = 155.0; rates["TTD"] = 6.8; rates["BBD"] = 2.0;
+    rates["BSD"] = 1.0; rates["KYD"] = 0.83; rates["XCD"] = 2.7; rates["ANG"] = 1.79; rates["AWG"] = 1.79;
+    rates["BMD"] = 1.0; rates["BZD"] = 2.0; rates["CUC"] = 1.0; rates["CUP"] = 24.0; rates["DOP"] = 57.0;
+    rates["HTG"] = 98.0; rates["NIO"] = 36.5; rates["PAB"] = 1.0; rates["SVC"] = 8.75; rates["GIP"] = 0.73;
+    rates["FKP"] = 0.73; rates["SHP"] = 0.73; rates["GGP"] = 0.73; rates["IMP"] = 0.73; rates["JEP"] = 0.73;
+    rates["ALL"] = 102.0; rates["AMD"] = 395.0; rates["AZN"] = 1.7; rates["BAM"] = 1.63; rates["BGN"] = 1.62;
+    rates["BYN"] = 2.5; rates["GEL"] = 2.7; rates["HRK"] = 6.2; rates["ISK"] = 129.0; rates["KGS"] = 84.5;
+    rates["KZT"] = 430.0; rates["MDL"] = 17.5; rates["MKD"] = 51.0; rates["MNT"] = 2850.0; rates["RSD"] = 98.0;
+    rates["TJS"] = 11.3; rates["TMT"] = 3.5; rates["UAH"] = 27.0; rates["UZS"] = 11200.0; rates["AFN"] = 89.0;
+    rates["DZD"] = 135.0; rates["AOA"] = 510.0; rates["XAF"] = 545.0; rates["XOF"] = 545.0; rates["BIF"] = 2070.0;
+    rates["CDF"] = 2000.0; rates["CVE"] = 91.5; rates["DJF"] = 178.0; rates["ERN"] = 15.0; rates["ETB"] = 52.0;
+    rates["GMD"] = 52.0; rates["GNF"] = 8600.0; rates["KES"] = 120.0; rates["KMF"] = 410.0; rates["LSL"] = 14.5;
+    rates["LRD"] = 155.0; rates["LYD"] = 4.5; rates["MAD"] = 9.0; rates["MGA"] = 4100.0; rates["MUR"] = 43.0;
+    rates["MZN"] = 63.5; rates["NAD"] = 14.5; rates["NGN"] = 415.0; rates["RWF"] = 1020.0; rates["SCR"] = 14.0;
+    rates["SDG"] = 450.0; rates["SOS"] = 580.0; rates["SSP"] = 130.0; rates["SZL"] = 14.5; rates["TND"] = 2.8;
+    rates["TZS"] = 2300.0; rates["UGX"] = 3700.0; rates["XPF"] = 98.0; rates["ZMW"] = 17.0; rates["ZWL"] = 322.0;
+    rates["ARS"] = 200.0; rates["BOB"] = 6.9; rates["CLP"] = 800.0; rates["COP"] = 3800.0; rates["CRC"] = 620.0;
+    rates["CUP"] = 24.0; rates["DOP"] = 57.0; rates["GTQ"] = 7.7; rates["HNL"] = 24.5; rates["PYG"] = 7000.0;
+    rates["PEN"] = 3.8; rates["SRD"] = 21.0; rates["UYU"] = 40.0; rates["VES"] = 5.0; rates["FJD"] = 2.1;
+    rates["PGK"] = 3.5; rates["SBD"] = 8.0; rates["TOP"] = 2.3; rates["VUV"] = 118.0; rates["WST"] = 2.7;
+    rates["BTN"] = 74.5; rates["MVR"] = 15.4; rates["KPW"] = 900.0; rates["STN"] = 20.5; rates["TVD"] = 1.35;
+}
+
+int main() {
+    initializeRates();
+    cout << "Currency Converter (Choose from over 100 currencies)\n";
+    cout << "Available currencies:\n";
+    for (size_t i = 0; i < currencies.size(); ++i) {
+        cout << (i + 1) << ". " << currencies[i].first << " - " << currencies[i].second << endl;
+    }
+
+    cout << "\nEnter amount: ";
+    double amount;
+    cin >> amount;
+
+    cout << "Choose 'from' currency number: ";
+    int fromIndex;
+    cin >> fromIndex;
+    if (fromIndex < 1 || fromIndex > currencies.size()) {
+        cout << "Invalid choice.\n";
+        return 1;
+    }
+    string from = currencies[fromIndex - 1].first;
+
+    cout << "Choose 'to' currency number: ";
+    int toIndex;
+    cin >> toIndex;
+    if (toIndex < 1 || toIndex > currencies.size()) {
+        cout << "Invalid choice.\n";
+        return 1;
+    }
+    string to = currencies[toIndex - 1].first;
+
+    // Convert
+    double usdAmount = amount / rates[from];
+    double converted = usdAmount * rates[to];
+
+    cout << fixed << setprecision(2);
+    cout << amount << " " << from << " = " << converted << " " << to << endl;
+
+    return 0;
+}
